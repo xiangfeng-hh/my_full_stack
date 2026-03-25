@@ -2,6 +2,11 @@ FROM python:3.10
 
 ENV PYTHONUNBUFFERED=1
 
+# 使用阿里云 PyPI 镜像源（加速 uv 下载依赖）
+ENV UV_INDEX_URL=https://mirrors.aliyun.com/pypi/simple/
+# 请求失败自动重试 3 次（提高 VPN / 不稳定网络环境下成功率）
+ENV UV_HTTP_RETRIES=3
+
 # Install uv
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#installing-uv
 COPY --from=ghcr.io/astral-sh/uv:0.9.26 /uv /uvx /bin/
