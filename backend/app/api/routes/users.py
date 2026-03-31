@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import col, delete, func, select
 
 from app import crud
+from app.modules.user.crud import get_user_by_email 
 from app.api.deps import (
     CurrentUser,
     SessionDep,
@@ -12,7 +13,7 @@ from app.api.deps import (
 )
 from app.core.config import settings
 from app.core.security import get_password_hash, verify_password
-from app.models import (
+from app.modules.user.models  import (
     Item,
     Message,
     UpdatePassword,
@@ -57,7 +58,7 @@ def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
     """
     Create new user.
     """
-    user = crud.get_user_by_email(session=session, email=user_in.email)
+    user = get_user_by_email(session=session, email=user_in.email)
     if user:
         raise HTTPException(
             status_code=400,
@@ -86,7 +87,7 @@ def update_user_me(
     """
 
     if user_in.email:
-        existing_user = crud.get_user_by_email(session=session, email=user_in.email)
+        existing_user = get_user_by_email(session=session, email=user_in.email)
         if existing_user and existing_user.id != current_user.id:
             raise HTTPException(
                 status_code=409, detail="User with this email already exists"
@@ -147,7 +148,7 @@ def register_user(session: SessionDep, user_in: UserRegister) -> Any:
     """
     Create new user without the need to be logged in.
     """
-    user = crud.get_user_by_email(session=session, email=user_in.email)
+    user = get_user_by_email(session=session, email=user_in.email)
     if user:
         raise HTTPException(
             status_code=400,
@@ -200,7 +201,7 @@ def update_user(
             detail="The user with this id does not exist in the system",
         )
     if user_in.email:
-        existing_user = crud.get_user_by_email(session=session, email=user_in.email)
+        existing_user = get_user_by_email(session=session, email=user_in.email)
         if existing_user and existing_user.id != user_id:
             raise HTTPException(
                 status_code=409, detail="User with this email already exists"

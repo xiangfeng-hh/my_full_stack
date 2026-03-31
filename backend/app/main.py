@@ -1,10 +1,12 @@
-import sentry_sdk
+import sentry_sdk  # noqa: I001
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
 from app.core.config import settings
+
+
 
 
 def custom_generate_unique_id(route: APIRoute) -> str:
@@ -31,3 +33,6 @@ if settings.all_cors_origins:
     )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+from app.modules.user.router import router as user
+app.include_router(user, prefix=settings.API_V1_STR, tags=["用户"])
