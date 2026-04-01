@@ -6,15 +6,13 @@ from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app import crud
-from app.modules.user import crud
+from app.modules.login import crud
 from app.modules.deps import CurrentUser, SessionDep, get_current_active_superuser
 from app.core import security
 from app.core.config import settings
-from app.modules.user.models import Message, NewPassword, UserPublic, UserUpdate
-from app.utils import (
-    send_email,
-)
-from app.modules.user.models import Token
+from app.modules.login.models import Message, NewPassword, UserPublic, UserUpdate
+
+from app.modules.login.models import Token
 
 router = APIRouter()
 

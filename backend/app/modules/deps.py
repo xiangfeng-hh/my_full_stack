@@ -12,7 +12,7 @@ from app.core import security
 from app.core.config import settings
 from app.core.db import engine
 
-from app.modules.user.models import User ,TokenPayload
+from app.modules.login.models import User ,TokenPayload
 
 # Swagger文档，Authorize 按钮点进去会看到tokenUrl
 reusable_oauth2 = OAuth2PasswordBearer(

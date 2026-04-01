@@ -4,7 +4,7 @@ from typing import Any
 from sqlmodel import Session, select
 
 from app.core.security import get_password_hash, verify_password
-from app.modules.user.models import Item, ItemCreate, User, UserCreate, UserUpdate
+from app.modules.login.models import Item, ItemCreate, User, UserCreate, UserUpdate
 
 def get_user_by_email(*, session: Session, email: str) -> User | None:
     statement = select(User).where(User.email == email)

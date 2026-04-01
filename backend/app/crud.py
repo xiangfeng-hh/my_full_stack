@@ -4,7 +4,7 @@ from typing import Any
 from sqlmodel import Session, select
 
 from app.core.security import get_password_hash, verify_password
-from app.modules.user.models  import Item, ItemCreate, User, UserCreate, UserUpdate
+from app.modules.login.models  import Item, ItemCreate, User, UserCreate, UserUpdate
 
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
@@ -18,12 +18,14 @@ def create_user(*, session: Session, user_create: UserCreate) -> User:
 
 
 def update_user(*, session: Session, db_user: User, user_in: UserUpdate) -> Any:
+    #PATCH 局部更新的关键 unset（前端没传）: 不会出现在字典结果里
     user_data = user_in.model_dump(exclude_unset=True)
     extra_data = {}
     if "password" in user_data:
         password = user_data["password"]
         hashed_password = get_password_hash(password)
         extra_data["hashed_password"] = hashed_password
+    #update程序端补充或重写的数据（优先级更高）
     db_user.sqlmodel_update(user_data, update=extra_data)
     session.add(db_user)
     session.commit()

@@ -32,7 +32,13 @@ if settings.all_cors_origins:
         allow_headers=["*"],
     )
 
-app.include_router(api_router, prefix=settings.API_V1_STR)
 
-from app.modules.user.router import router as user
-app.include_router(user, prefix=settings.API_V1_STR, tags=["用户"])
+
+from app.modules.login.router import router as login
+from app.modules.utils.router import router as utils
+from app.modules.users.router import router as users
+app.include_router(login, prefix=settings.API_V1_STR, tags=["登录"])
+app.include_router(utils, prefix=f"{settings.API_V1_STR}/utils", tags=["工具"])
+app.include_router(users, prefix=f"{settings.API_V1_STR}/users", tags=["用户"])
+
+app.include_router(api_router, prefix=settings.API_V1_STR)

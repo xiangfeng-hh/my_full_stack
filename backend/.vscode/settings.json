@@ -1,0 +1,4 @@
+{
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "ruff.interpreter": ["/app/.venv/bin/python","/usr/local/bin/python"]
+}
