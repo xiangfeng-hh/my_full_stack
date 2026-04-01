@@ -4,8 +4,9 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import col, delete, func, select
 
-from app import crud
-from app.modules.login.crud import get_user_by_email
+from app.api.users import crud
+
+from app.api.login.crud import get_user_by_email
 from app.api.deps import (
     CurrentUser,
     SessionDep,
@@ -13,9 +14,8 @@ from app.api.deps import (
 )
 from app.core.config import settings
 from app.core.security import get_password_hash, verify_password
-from app.modules.login.models import (
+from app.api.models import (
     Item,
-    Message,
     UpdatePassword,
     User,
     UserCreate,
@@ -24,10 +24,12 @@ from app.modules.login.models import (
     UsersPublic,
     UserUpdate,
     UserUpdateMe,
+    Message,
 )
 
 
 router = APIRouter()
+
 
 @router.get("/me", response_model=UserPublic)
 def read_user_me(current_user: CurrentUser):
@@ -35,6 +37,7 @@ def read_user_me(current_user: CurrentUser):
     获取当前用户
     """
     return current_user
+
 
 @router.patch("/me", response_model=UserPublic)
 def update_user_me(
@@ -46,9 +49,7 @@ def update_user_me(
     if user_in.email:
         existing_user = get_user_by_email(session=session, email=user_in.email)
         if existing_user and existing_user.id != current_user.id:
-            raise HTTPException(
-                status_code=409, detail="User with this email 已存在"
-            )
+            raise HTTPException(status_code=409, detail="User with this email 已存在")
     user_data = user_in.model_dump(exclude_unset=True)
     current_user.sqlmodel_update(user_data)
     session.add(current_user)
@@ -68,9 +69,7 @@ def update_password_me(
     if not verified:
         raise HTTPException(status_code=400, detail="密码错误")
     if body.current_password == body.new_password:
-        raise HTTPException(
-            status_code=400, detail="新密码不能与当前密码相同"
-        )
+        raise HTTPException(status_code=400, detail="新密码不能与当前密码相同")
     hashed_password = get_password_hash(body.new_password)
     current_user.hashed_password = hashed_password
     session.add(current_user)
@@ -84,12 +83,11 @@ def delete_user_me(session: SessionDep, current_user: CurrentUser) -> Any:
     删除用户自己
     """
     if current_user.is_superuser:
-        raise HTTPException(
-            status_code=403, detail="超级用户不允许删除自己"
-        )
+        raise HTTPException(status_code=403, detail="超级用户不允许删除自己")
     session.delete(current_user)
     session.commit()
     return Message(message="删除成功")
+
 
 @router.post("/signup", response_model=UserPublic)
 def register_user(session: SessionDep, user_in: UserRegister):
@@ -189,12 +187,11 @@ def update_user(
     if user_in.email:
         existing_user = get_user_by_email(session=session, email=user_in.email)
         if existing_user and existing_user.id != user_id:
-            raise HTTPException(
-                status_code=409, detail="该 email已存在"
-            )
+            raise HTTPException(status_code=409, detail="该 email已存在")
 
     db_user = crud.update_user(session=session, db_user=db_user, user_in=user_in)
     return db_user
+
 
 @router.delete("/{user_id}", dependencies=[Depends(get_current_active_superuser)])
 def delete_user(
@@ -207,9 +204,7 @@ def delete_user(
     if not user:
         raise HTTPException(status_code=404, detail="用户不存在")
     if user == current_user:
-        raise HTTPException(
-            status_code=403, detail="超级用户不允许删除自己"
-        )
+        raise HTTPException(status_code=403, detail="超级用户不允许删除自己")
     statement = delete(Item).where(col(Item.owner_id) == user_id)
     session.exec(statement)
     session.delete(user)

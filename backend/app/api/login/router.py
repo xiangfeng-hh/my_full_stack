@@ -1,18 +1,17 @@
 from datetime import timedelta
-from typing import Annotated, Any
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app import crud
-from app.modules.login import crud
-from app.modules.deps import CurrentUser, SessionDep, get_current_active_superuser
+
+from app.api.login import crud
+from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from app.core import security
 from app.core.config import settings
-from app.modules.login.models import Message, NewPassword, UserPublic, UserUpdate
+from app.api.models import NewPassword, UserPublic, UserUpdate,Message,Token
 
-from app.modules.login.models import Token
+
 
 router = APIRouter()
 
