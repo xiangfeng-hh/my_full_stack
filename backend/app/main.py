@@ -10,6 +10,7 @@ from app.core.config import settings
 
 
 def custom_generate_unique_id(route: APIRoute) -> str:
+    # route.name 路由处理函数名
     return f"{route.tags[0]}-{route.name}"
 
 

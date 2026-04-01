@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 max_tries = 60 * 5  # 5 minutes
 wait_seconds = 1
 
-
+# @retry 装饰器失败会继续重试，直到成功或超时
 @retry(
     stop=stop_after_attempt(max_tries),
     wait=wait_fixed(wait_seconds),
@@ -22,7 +22,8 @@ wait_seconds = 1
 def init(db_engine: Engine) -> None:
     try:
         with Session(db_engine) as session:
-            # Try to create session to check if DB is awake
+            # 尝试创建一个会话session来检查数据库是否处于运行状态
+            # select(1)不查表,只验证数据库连接可建立、SQL 可执行
             session.exec(select(1))
     except Exception as e:
         logger.error(e)
@@ -30,9 +31,9 @@ def init(db_engine: Engine) -> None:
 
 
 def main() -> None:
-    logger.info("Initializing service")
+    logger.info("初始化服务")
     init(engine)
-    logger.info("Service finished initializing")
+    logger.info("服务初始化完成")
 
 
 if __name__ == "__main__":

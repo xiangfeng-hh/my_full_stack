@@ -6,10 +6,10 @@ from app.api.models  import User, UserCreate
 
 engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 
+# 确保初始化数据库之前已导入所有 SQLModel 模型（app.api.models）
+# 否则，SQLModel 可能无法正确初始化关系
+# 更多详情请参考：https://github.com/fastapi/full-stack-fastapi-template/issues/28
 
-# make sure all SQLModel models are imported (app.api.models ) before initializing DB
-# otherwise, SQLModel might fail to initialize relationships properly
-# for more details: https://github.com/fastapi/full-stack-fastapi-template/issues/28
 
 
 def init_db(session: Session) -> None:
