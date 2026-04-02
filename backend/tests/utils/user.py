@@ -1,7 +1,10 @@
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
-from app import crud
+from app.api.users import crud
+from app.api.login.crud import get_user_by_email
+
+
 from app.core.config import settings
 from app.api.models  import User, UserCreate, UserUpdate
 from tests.utils.utils import random_email, random_lower_string
@@ -36,7 +39,7 @@ def authentication_token_from_email(
     If the user doesn't exist it is created first.
     """
     password = random_lower_string()
-    user = crud.get_user_by_email(session=db, email=email)
+    user = get_user_by_email(session=db, email=email)
     if not user:
         user_in_create = UserCreate(email=email, password=password)
         user = crud.create_user(session=db, user_create=user_in_create)

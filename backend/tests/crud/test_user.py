@@ -2,7 +2,8 @@ from fastapi.encoders import jsonable_encoder
 from pwdlib.hashers.bcrypt import BcryptHasher
 from sqlmodel import Session
 
-from app import crud
+from app.api.login.crud import authenticate
+from app.api.users import crud
 from app.core.security import verify_password
 from app.api.models  import User, UserCreate, UserUpdate
 from tests.utils.utils import random_email, random_lower_string
@@ -22,7 +23,7 @@ def test_authenticate_user(db: Session) -> None:
     password = random_lower_string()
     user_in = UserCreate(email=email, password=password)
     user = crud.create_user(session=db, user_create=user_in)
-    authenticated_user = crud.authenticate(session=db, email=email, password=password)
+    authenticated_user = authenticate(session=db, email=email, password=password)
     assert authenticated_user
     assert user.email == authenticated_user.email
 
@@ -30,7 +31,7 @@ def test_authenticate_user(db: Session) -> None:
 def test_not_authenticate_user(db: Session) -> None:
     email = random_email()
     password = random_lower_string()
-    user = crud.authenticate(session=db, email=email, password=password)
+    user = authenticate(session=db, email=email, password=password)
     assert user is None
 
 
@@ -113,7 +114,7 @@ def test_authenticate_user_with_bcrypt_upgrades_to_argon2(db: Session) -> None:
     assert user.hashed_password.startswith("$2")
 
     # Authenticate - this should upgrade the hash to argon2
-    authenticated_user = crud.authenticate(session=db, email=email, password=password)
+    authenticated_user = authenticate(session=db, email=email, password=password)
     assert authenticated_user
     assert authenticated_user.email == email
 
