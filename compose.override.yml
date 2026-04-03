@@ -62,12 +62,12 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    # command: sleep infinity  # Infinite loop to keep container alive doing nothing
-    command:
-      - fastapi
-      - run
-      - --reload
-      - "app/main.py"
+    command: sleep infinity  # Infinite loop to keep container alive doing nothing
+    # command:
+    #   - fastapi
+    #   - run
+    #   - --reload
+    #   - "app/main.py"
     develop:
       watch:
         - path: ./backend
@@ -80,18 +80,11 @@ services:
           action: rebuild
     # TODO: remove once coverage is done locally
     volumes:
-      - ./backend/htmlcov:/app/backend/htmlcov
+      - ./backend:/app/backend
+      # - ./backend/htmlcov:/app/backend/htmlcov
     environment:
-      SMTP_HOST: "mailcatcher"
-      SMTP_PORT: "1025"
-      SMTP_TLS: "false"
-      EMAILS_FROM_EMAIL: "noreply@example.com"
+      
 
-  mailcatcher:
-    image: schickling/mailcatcher
-    ports:
-      - "1080:1080"
-      - "1025:1025"
 
   frontend:
     restart: "no"
@@ -114,12 +107,10 @@ services:
     ipc: host
     depends_on:
       - backend
-      - mailcatcher
     env_file:
       - .env
     environment:
       - VITE_API_URL=http://backend:8000
-      - MAILCATCHER_HOST=http://mailcatcher:1080
       # For the reports when run locally
       - PLAYWRIGHT_HTML_HOST=0.0.0.0
       - CI=${CI}
