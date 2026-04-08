@@ -62,12 +62,12 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    command: sleep infinity  # Infinite loop to keep container alive doing nothing
-    # command:
-    #   - fastapi
-    #   - run
-    #   - --reload
-    #   - "app/main.py"
+    # command: sleep infinity  # Infinite loop to keep container alive doing nothing
+    command:
+      - fastapi
+      - run
+      - --reload
+      - "app/main.py"
     develop:
       watch:
         - path: ./backend
@@ -97,28 +97,7 @@ services:
         - VITE_API_URL=http://localhost:8000
         - NODE_ENV=development
 
-  playwright:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile.playwright
-      args:
-        - VITE_API_URL=http://backend:8000
-        - NODE_ENV=production
-    ipc: host
-    depends_on:
-      - backend
-    env_file:
-      - .env
-    environment:
-      - VITE_API_URL=http://backend:8000
-      # For the reports when run locally
-      - PLAYWRIGHT_HTML_HOST=0.0.0.0
-      - CI=${CI}
-    volumes:
-      - ./frontend/blob-report:/app/frontend/blob-report
-      - ./frontend/test-results:/app/frontend/test-results
-    ports:
-      - 9323:9323
+
 
 networks:
   traefik-public:
